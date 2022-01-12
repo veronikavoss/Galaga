@@ -14,7 +14,8 @@ class Enemy(pygame.sprite.Sprite):
         self.image=self.enemies_images[self.enemy_name][self.frame_index]
         self.rect=self.image.get_rect(x=x,y=y)
         
-        self.enemies_missile=pygame.sprite.Group(Enemy_Missile(self.asset,self.rect.midbottom))
+        # self.enemies_missile=pygame.sprite.Group()
+        # self.enemies_missile.add(Enemy_Missile(self.asset,self.rect.center))
     
     def animation(self):
         self.frame_index+=0.02
@@ -25,12 +26,8 @@ class Enemy(pygame.sprite.Sprite):
         self.image=animation[int(self.frame_index)]
     
     def update(self):
-        # self.rect.y+=5
-        self.enemies_missile.update()
+        self.rect.y+=2
         self.animation()
-    
-    # def enemy_draw(self,screen):
-    #     self.enemies_missile.draw(screen)
 
 class Destroy_Enemy(pygame.sprite.Sprite):
     def __init__(self,asset,center):

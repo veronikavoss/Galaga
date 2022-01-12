@@ -3,7 +3,7 @@ from setting import *
 from missile import *
 #%%
 class Player(pygame.sprite.Sprite):
-    def __init__(self,asset,playing):
+    def __init__(self,asset):
         pygame.sprite.Sprite.__init__(self)
         self.asset=asset
         self.player_images=self.asset.player_images
@@ -12,12 +12,8 @@ class Player(pygame.sprite.Sprite):
         self.frame_index=0
         self.image=self.player_images[self.status][self.frame_index+6]
         self.rect=self.image.get_rect(midbottom=(screen_width//2,stage_height))
-        self.player_destroyed_pos=(0,0)
         self.speed=5
         self.launched=False
-        self.playing_game=playing
-        self.player_destroyed=False
-        self.player_die=False
         
         self.player_missiles=pygame.sprite.Group()
     
@@ -43,22 +39,8 @@ class Player(pygame.sprite.Sprite):
         self.player_missiles.add(Missile(self.asset,self.rect.midtop))
         self.launched=True
     
-    def animation(self):
-        if self.player_destroyed:
-            animation=self.asset.player_destroy_images
-            self.rect.center=(self.player_destroyed_pos)
-            self.frame_index+=0.2
-            if self.frame_index>=len(animation):
-                self.frame_index=0
-                self.player_missiles.empty()
-                self.playing_game=False
-                self.kill()
-            self.image=animation[int(self.frame_index)]
-    
     def update(self):
         self.key_input()
-        # print(self.player_destroyed_pos,self.rect.center)
-        self.animation()
 
 class Destoy_Player(pygame.sprite.Sprite):
     def __init__(self,asset,center):
@@ -75,7 +57,6 @@ class Destoy_Player(pygame.sprite.Sprite):
         if self.frame_index>=len(animation):
             self.frame_index=0
             self.kill()
-            self.player_destroyed=False
         self.image=animation[int(self.frame_index)]
     
     def update(self):

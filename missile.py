@@ -22,13 +22,13 @@ class Enemy_Missile(pygame.sprite.Sprite):
         self.missile_images=asset.missile_images
         self.image=self.missile_images[4]
         self.rect=self.image.get_rect(midbottom=midbottom)
-        self.speed=10
+        self.speed=5
     
     def update(self):
         self.rect.y+=self.speed
         if self.rect.top>stage_height:
             self.kill()
-        # print(self.rect)
+        print(self.rect)
     
-    def draw(self,screen):
-        screen.blit(self.image,self.rect)
+    # def draw(self,screen):
+    #     screen.blit(self.image,self.rect)
