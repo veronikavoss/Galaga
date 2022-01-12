@@ -1,28 +1,25 @@
 #%%
 from setting import *
-from bullet import *
+from missile import *
 #%%
 class Player(pygame.sprite.Sprite):
-    def __init__(self):
+    def __init__(self,asset,playing):
         pygame.sprite.Sprite.__init__(self)
-        self.bullet=pygame.sprite.Group()
-        self.image=pygame.Surface((30,20))
-        self.image.fill('blue')
-        self.rect=self.image.get_rect(midbottom=(screen_width//2,screen_height))
-        self.speed=3
-        self.launch_cooldown=400
-        self.launch_update=0
+        self.asset=asset
+        self.player_images=self.asset.player_images
+        self.player_destroy_images=self.asset.player_destroy_images
+        self.status='normal'
+        self.frame_index=0
+        self.image=self.player_images[self.status][self.frame_index+6]
+        self.rect=self.image.get_rect(midbottom=(screen_width//2,stage_height))
+        self.player_destroyed_pos=(0,0)
+        self.speed=5
         self.launched=False
-    
-    def launch_bullet(self):
-        self.bullet.add(Bullet(self.rect.midtop))
-        self.launch_update=pygame.time.get_ticks()
-        self.launched=True
-    
-    def launch_delay(self):
-        self.current_time=pygame.time.get_ticks()
-        if self.current_time-self.launch_update>=self.launch_cooldown:
-            self.launched=False
+        self.playing_game=playing
+        self.player_destroyed=False
+        self.player_die=False
+        
+        self.player_missiles=pygame.sprite.Group()
     
     def key_input(self):
         key_input=pygame.key.get_pressed()
@@ -30,10 +27,56 @@ class Player(pygame.sprite.Sprite):
             self.rect.x-=self.speed
         elif key_input[pygame.K_RIGHT]:
             self.rect.x+=self.speed
-        if key_input[pygame.K_SPACE] and not self.launched:
-            self.launch_bullet()
+        
+        if self.rect.left<=0:
+            self.rect.left=0
+        elif self.rect.right>=stage_width:
+            self.rect.right=stage_width
+        
+        if key_input[pygame.K_SPACE]:
+            if not self.launched:
+                self.launch_missile()
+        else:
+            self.launched=False
+    
+    def launch_missile(self):
+        self.player_missiles.add(Missile(self.asset,self.rect.midtop))
+        self.launched=True
+    
+    def animation(self):
+        if self.player_destroyed:
+            animation=self.asset.player_destroy_images
+            self.rect.center=(self.player_destroyed_pos)
+            self.frame_index+=0.2
+            if self.frame_index>=len(animation):
+                self.frame_index=0
+                self.player_missiles.empty()
+                self.playing_game=False
+                self.kill()
+            self.image=animation[int(self.frame_index)]
     
     def update(self):
         self.key_input()
-        self.launch_delay()
-        print(self.launched)
+        # print(self.player_destroyed_pos,self.rect.center)
+        self.animation()
+
+class Destoy_Player(pygame.sprite.Sprite):
+    def __init__(self,asset,center):
+        super().__init__()
+        self.asset=asset
+        self.player_destroy_images=asset.player_destroy_images
+        self.frame_index=0
+        self.image=self.player_destroy_images[self.frame_index]
+        self.rect=self.image.get_rect(center=center)
+    
+    def animation(self):
+        animation=self.asset.player_destroy_images
+        self.frame_index+=0.2
+        if self.frame_index>=len(animation):
+            self.frame_index=0
+            self.kill()
+            self.player_destroyed=False
+        self.image=animation[int(self.frame_index)]
+    
+    def update(self):
+        self.animation()

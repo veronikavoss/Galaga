@@ -1,4 +1,5 @@
 #%%
+from asset import Asset
 from setting import *
 from controller import *
 #%%
@@ -7,6 +8,7 @@ class Game:
         pygame.init()
         pygame.display.set_caption(title)
         self.screen=pygame.display.set_mode(screen_size)
+        self.asset=Asset()
         self.clock=pygame.time.Clock()
         self.playing=True
         self.start_screen()
@@ -15,6 +17,7 @@ class Game:
         self.start()
     
     def start(self):
+        self.controller=Controller(self.screen,self.asset)
         self.loop()
     
     def loop(self):
@@ -31,9 +34,10 @@ class Game:
                 self.playing=False
     
     def update(self):
-        pass
+        self.controller.update()
     
     def draw(self):
-        self.screen.fill('black')
+        self.controller.draw()
+
 galaga=Game()
 pygame.quit()
